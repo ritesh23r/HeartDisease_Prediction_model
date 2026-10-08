@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>HeartCheck</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #172033;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: 50px auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .heart {
+            font-size: 45px;
+        }
+
+        h1 {
+            margin: 10px 0;
+        }
+
+        .subtitle {
+            color: #667085;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d0d5dd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: #e63946;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .result.high {
+            background: #fff1f2;
+            color: #b42318;
+        }
+
+        .result.low {
+            background: #ecfdf3;
+            color: #027a48;
+        }
+
+        .result h2 {
+            margin-top: 0;
+        }
+
+        .disclaimer {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #667085;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .section-title {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="heart">❤️</div>
+
+        <h1>HeartCheck</h1>
+
+        <p class="subtitle">
+            Heart disease risk screening using machine learning
+        </p>
+    </div>
+
+    <div class="card">
+
+        <form action="/predict" method="POST">
+
+            <div class="field">
+                <label>Age</label>
+                <input type="number" name="age" min="1" max="120" required>
+            </div>
+
+            <div class="field">
+                <label>Sex</label>
+                <select name="sex" required>
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Resting Blood Pressure (mmHg)</label>
+                <input type="number" name="resting_bp" min="50" max="250" required>
+            </div>
+
+            <div class="field">
+                <label>Cholesterol (mg/dL)</label>
+                <input type="number" name="cholesterol" min="50" max="700" required>
+            </div>
+
+            <div class="field">
+                <label>Fasting Blood Sugar</label>
+                <select name="fasting_bs" required>
+                    <option value="0">Below 126 mg/dL</option>
+                    <option value="1">126 mg/dL or higher</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Maximum Heart Rate</label>
+                <input type="number" name="max_hr" min="50" max="250" required>
+            </div>
+
+            <div class="field">
+                <label>Oldpeak</label>
+                <input type="number" name="oldpeak" step="0.1" min="-5" max="10" required>
+            </div>
+
+            <h3 class="section-title">Heart Information</h3>
+
+            <div class="field">
+                <label>Chest Pain Type</label>
+
+                <select name="chest_pain" required>
+                    <option value="ATA">Atypical Angina</option>
+                    <option value="NAP">Non-Anginal Pain</option>
+                    <option value="TA">Typical Angina</option>
+                    <option value="None">No Chest Pain</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Resting ECG</label>
+
+                <select name="resting_ecg" required>
+                    <option value="Normal">Normal</option>
+                    <option value="ST">ST-T Wave Abnormality</option>
+                    <option value="LVH">Left Ventricular Hypertrophy</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Exercise-Induced Angina</label>
+
+                <select name="exercise_angina" required>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>ST Slope</label>
+
+                <select name="st_slope" required>
+                    <option value="Flat">Flat</option>
+                    <option value="Up">Up</option>
+                    <option value="Down">Down</option>
+                </select>
+            </div>
+
+            <button type="submit">
+                Check Result
+            </button>
+
+        </form>
+
+        {% if result %}
+
+        <div class="result {{ result_type }}">
+
+            <h2>{{ result }}</h2>
+
+            <p>
+                Model confidence for this predicted class:
+                <strong>{{ probability }}%</strong>
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="disclaimer">
+        <strong>Important:</strong>
+        This is an experimental machine-learning screening tool.
+        It does not diagnose heart disease or predict whether someone
+        will have a heart attack. For medical concerns, consult a
+        qualified healthcare professional. If you are experiencing
+        severe or emergency symptoms, seek urgent medical care.
+    </div>
+
+</div>
+
+</body>
+</html>
